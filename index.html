@@ -934,6 +934,7 @@ function showScreen(id) {
   el.classList.add('active', 'fade-in');
   setTimeout(() => el.classList.remove('fade-in'), 500);
   currentScreen = id;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ── CSS VAR HELPER ────────────────────────────────────────────────
