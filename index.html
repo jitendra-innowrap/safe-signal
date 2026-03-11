@@ -1112,7 +1112,7 @@ function goBack() {
 document.getElementById('btn-whatsapp').addEventListener('click', () => {
   const cfg = STATUS_CONFIG[state.status];
   const url = generateShareLink();
-  const text = `${cfg.emoji} *${state.name} is ${cfg.bar.toUpperCase()}* — Live Safety Signal\n📍 Currently in: ${state.cityCurrentIn}\n👨‍👩‍👧 Family in: ${state.cityFamilyIn}\n⏰ Last updated: ${formatTime(new Date())}\n\nTrack live safety status: 👉 ${url}\n\n_SafeSignal — Free crisis tool by Innowrap Technologies_`;
+  const text = `${cfg.emoji} *${state.name} is ${cfg.bar.toUpperCase()}* - Live Safety Signal\n📍 Currently in: ${state.cityCurrentIn}\n👨‍👩‍👧 Family in: ${state.cityFamilyIn}\n⏰ Last updated: ${formatTime(new Date())}\n\nTrack live safety status: 👉 ${url}\n\n_SafeSignal - Free crisis tool by Innowrap Technologies_`;
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 });
 
@@ -1282,7 +1282,7 @@ function shareWhatsAppImage() {
   downloadImage();
   const cfg = STATUS_CONFIG[state.status];
   const url = generateShareLink();
-  const text = `${cfg.emoji} *${state.name} is ${cfg.bar.toUpperCase()}* — See image for my safety signal. Track live safety status here: 👉 ${url}\n\n_SafeSignal — Free crisis tool by Innowrap Technologies_`;
+  const text = `${cfg.emoji} *${state.name} is ${cfg.bar.toUpperCase()}* - See image for my safety signal. Track live safety status here: 👉 ${url}\n\n_SafeSignal - Free crisis tool by Innowrap Technologies_`;
   setTimeout(() => window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'), 500);
 }
 
