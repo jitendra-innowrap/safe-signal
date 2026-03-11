@@ -829,7 +829,7 @@ footer .cta-link {
   <!-- SCREEN 3: FAMILY VIEW                           -->
   <!-- ════════════════════════════════════════════════ -->
   <div id="screen-family" class="screen">
-    <button class="btn-back" onclick="goBack()">
+    <button class="btn-back" id="btn-back-signal" onclick="goBack()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
       Back to Signal
     </button>
@@ -1369,6 +1369,7 @@ window.addEventListener('DOMContentLoaded', () => {
         state.timeline = payload.t.map(x => ({ status: x.s, time: new Date(x.t) }));
       }
       applyStatusColors(state.status);
+      document.getElementById('btn-back-signal').style.display = 'none';
       showFamilyView();
     } catch (e) {
       console.error("Failed to parse signal data", e);
