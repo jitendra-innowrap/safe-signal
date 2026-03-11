@@ -1,25 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SafeSignal — I'm Safe | By Innowrap Technologies</title>
-    <meta name="description"
-        content="Free crisis safety tool. Send a real-time safety signal to loved ones worldwide. Built by Innowrap Technologies.">
-
-    <!-- Open Graph for sharing -->
-    <meta property="og:title" content="SafeSignal — I'm Safe | By Innowrap Technologies">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeSignal — I'm Safe | By Innowrap Technologies</title>
+<meta name="description" content="Free crisis safety tool. Send a real-time safety signal to loved ones worldwide. Built by Innowrap Technologies.">
+<meta property="og:title" content="SafeSignal — Live Safety Signal">
+<meta property="og:description" content="A loved one has shared their safety status with you. Open to see their live signal.">
     <meta property="og:description"
         content="Free crisis safety tool. Send a real-time safety signal to loved ones worldwide.">
     <meta property="og:type" content="website">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
 
     <!-- Google Places API (Replaced with real key in production) -->
     <script
@@ -27,1358 +17,1368 @@
         async defer
         onerror="console.warn('Google Maps API failed to load. Falling back to standard text inputs.')"></script>
 
-    <style>
-        :root {
-            /* Color Palette */
-            --bg: #0B0F0E;
-            --surface: #141A18;
-            --surface2: #1C2420;
-            --border: rgba(255, 255, 255, 0.08);
-            --green: #22C55E;
-            --amber: #F59E0B;
-            --red: #EF4444;
-            --text: #F0F4F2;
-            --muted: #6B7C75;
-            --innowrap: #00B4D8;
-
-            /* Dimensions */
-            --max-width: 520px;
-
-            /* Status specific variables (will be updated via JS) */
-            --status-color: var(--green);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            font-size: 22px;
-            font-weight: 400;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        h1,
-        h2,
-        h3,
-        .serif {
-            font-family: 'Fraunces', serif;
-        }
-
-        /* Top Bar */
-        .top-bar {
-            width: 100%;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: flex-end;
-            font-size: 0.75rem;
-            /* ~16px based on 22px base */
-            color: var(--muted);
-        }
-
-        .top-bar a {
-            color: var(--muted);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .top-bar a:hover {
-            color: var(--text);
-        }
-
-        /* Layout Container */
-        .container {
-            width: 100%;
-            max-width: var(--max-width);
-            margin: 0 auto;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* Screen Management */
-        .screen {
-            display: none;
-            flex-direction: column;
-            padding: 24px;
-            animation: fadeIn 0.4s ease forwards;
-        }
-
-        .screen.active {
-            display: flex;
-        }
-
-        /* Footer */
-        footer {
-            width: 100%;
-            padding: 24px 16px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-top: auto;
-        }
-
-        footer a {
-            color: var(--innowrap);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Typography & Utilities */
-        .text-center {
-            text-align: center;
-        }
-
-        .text-muted {
-            color: var(--muted);
-        }
-
-        .mb-1 {
-            margin-bottom: 8px;
-        }
-
-        .mb-2 {
-            margin-bottom: 16px;
-        }
-
-        .mb-3 {
-            margin-bottom: 24px;
-        }
-
-        .mb-4 {
-            margin-bottom: 32px;
-        }
-
-        .italic-emphasis {
-            font-family: 'Fraunces', serif;
-            font-style: italic;
-            font-weight: 600;
-        }
-
-        /* Components */
-        .chip-container {
-            display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            gap: 12px;
-            padding: 4px 0 16px;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .chip-container::-webkit-scrollbar {
-            display: none;
-            /* Hide scrollbar for Chrome/Safari */
-        }
-
-        .chip {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 20px;
-            white-space: nowrap;
-            font-size: 0.8rem;
-            color: var(--text);
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            font-weight: 500;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
-        input[type="text"],
-        textarea {
-            background-color: var(--surface2);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 1rem;
-            width: 100%;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--innowrap);
-        }
-
-        input::placeholder,
-        textarea::placeholder {
-            color: var(--muted);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        /* Buttons */
-        .btn {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            background-color: var(--surface2);
-        }
-
-        .btn-primary {
-            background-color: var(--text);
-            color: var(--bg);
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: white;
-            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-whatsapp {
-            background-color: #25D366;
-            /* WhatsApp Green */
-            color: white;
-            border: none;
-        }
-
-        .btn-whatsapp:hover {
-            background-color: #20BA56;
-            box-shadow: 0 4px 16px rgba(37, 211, 102, 0.2);
-        }
-
-        .btn-icon {
-            font-size: 1.2rem;
-        }
-
-        /* Screen 1 Setup Styling */
-        .hero-title {
-            font-size: 2.5rem;
-            line-height: 1.1;
-            margin-bottom: 12px;
-        }
-
-        .hero-subtitle {
-            font-size: 1.1rem;
-            color: var(--muted);
-            margin-bottom: 24px;
-        }
-
-        .disclaimer-box {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-top: 16px;
-            text-align: center;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes breathe {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-
-            50% {
-                transform: scale(1.4);
-                opacity: 0.7;
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes pulseRing {
-            0% {
-                box-shadow: 0 0 0 0 var(--status-color);
-            }
-
-            70% {
-                box-shadow: 0 0 0 20px rgba(0, 0, 0, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-            }
-        }
-
-        /* Status System */
-        .status-safe {
-            --status-color: var(--green);
-        }
-
-        .status-uncertain {
-            --status-color: var(--amber);
-        }
-
-        .status-help {
-            --status-color: var(--red);
-        }
-
-        .status-bar {
-            background-color: var(--status-color);
-            color: #fff;
-            padding: 8px 16px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            transition: background-color 0.3s;
-        }
-
-        /* Screen 2/3 Shared Status Block */
-        .status-block {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0) 100%);
-            border: 1px solid var(--border);
-            border-top: 2px solid var(--status-color);
-            border-radius: 16px;
-            padding: 32px 16px;
-            text-align: center;
-            margin-bottom: 24px;
-            position: relative;
-            overflow: hidden;
-            transition: border-top-color 0.3s;
-        }
-
-        .status-glow {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 100px;
-            background: var(--status-color);
-            filter: blur(50px);
-            opacity: 0.15;
-            transition: background-color 0.3s;
-        }
-
-        .status-emoji {
-            font-size: 4rem;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .status-label {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .status-sub {
-            font-size: 0.8rem;
-            color: var(--muted);
-            position: relative;
-            z-index: 2;
-        }
-
-        .signal-name {
-            font-size: 2rem;
-            margin-top: 16px;
-            margin-bottom: 4px;
-        }
-
-        .signal-location {
-            color: var(--muted);
-            font-size: 0.9rem;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .message-box {
-            border-left: 3px solid var(--border);
-            padding: 12px 16px;
-            margin-bottom: 24px;
-            font-style: italic;
-            color: var(--text);
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 0 8px 8px 0;
-        }
-
-        .metadata-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-
-        .meta-item {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-        }
-
-        .meta-label {
-            color: var(--muted);
-            margin-bottom: 4px;
-            font-size: 0.75rem;
-        }
-
-        .meta-val {
-            font-weight: 600;
-        }
-
-        .status-selector {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .status-selector h3 {
-            font-size: 1rem;
-            margin-bottom: 12px;
-        }
-
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .radio-label {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .radio-label:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .radio-label input {
-            margin-right: 12px;
-            width: 18px;
-            height: 18px;
-            accent-color: var(--status-color);
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        /* Screen 3 Timeline */
-        .timeline {
-            margin-top: 24px;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 6px;
-            bottom: 0;
-            width: 2px;
-            background: var(--border);
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 24px;
-        }
-
-        .timeline-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .timeline-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: var(--status-color);
-            position: absolute;
-            left: -20px;
-            top: 4px;
-            box-shadow: 0 0 0 4px var(--bg);
-        }
-
-        .timeline-time {
-            font-size: 0.75rem;
-            color: var(--muted);
-            margin-bottom: 2px;
-        }
-
-        .timeline-content {
-            font-size: 0.9rem;
-        }
-
-        /* Screen 3 Pulse Ring */
-        .pulse-ring-container {
-            display: flex;
-            justify-content: center;
-            margin: 32px 0 24px;
-        }
-
-        .pulse-ring {
-            width: 80px;
-            height: 80px;
-            background: var(--surface2);
-            border: 2px solid var(--status-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            animation: pulseRing 2s infinite;
-        }
-
-        .receiver-headline {
-            text-align: center;
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-        }
-
-        .receiver-subline {
-            text-align: center;
-            color: var(--muted);
-            font-size: 0.9rem;
-            margin-bottom: 32px;
-        }
-
-        .reassurance-note {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            font-size: 0.8rem;
-            margin-top: 32px;
-            color: var(--muted);
-        }
-
-        /* ── BACK BUTTON ─────────────────────────────────────────────── */
-        .btn-back {
-            display: flex; align-items: center; gap: 6px;
-            background: none; border: none;
-            color: var(--muted); font-family: 'Outfit', sans-serif;
-            font-size: 13px; cursor: pointer;
-            margin-bottom: 20px;
-            padding: 0;
-            transition: color 0.2s;
-        }
-        .btn-back:hover { color: var(--text); }
-
-        /* Screen spacing override for absolute position of status bar */
-        #screen-sender,
-        #screen-receiver {
-            padding-top: 60px;
-        }
-
-        /* Responsive */
-        @media (max-width: 400px) {
-            .input-row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-
-            .hero-title {
-                font-size: 2rem;
-            }
-
-            body {
-                font-size: 18px;
-            }
-        }
-
-        /* ── IMAGE MODAL ─────────────────────────────────────────────── */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-        }
-
-        .modal-overlay.open {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-box {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 480px;
-            width: 100%;
-            transform: translateY(20px);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-        }
-
-        .modal-overlay.open .modal-box {
-            transform: translateY(0);
-        }
-
-        .modal-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--muted);
-        }
-
-        #previewCanvas {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 10px;
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        .modal-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .btn-modal-close {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            color: var(--muted);
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s;
-        }
-
-        .btn-modal-close:hover {
-            color: var(--text);
-        }
-
-        /* ── TOAST ───────────────────────────────────────────────────── */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            padding: 12px 24px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text);
-            z-index: 300;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            white-space: nowrap;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0B0F0E;
+  --surface:  #141A18;
+  --surface2: #1C2420;
+  --border:   rgba(255,255,255,0.08);
+  --green:    #22C55E;
+  --green-dim:#16A34A;
+  --amber:    #F59E0B;
+  --amber-dim:#D97706;
+  --red:      #EF4444;
+  --red-dim:  #DC2626;
+  --text:     #F0F4F2;
+  --muted:    #6B7C75;
+  --innowrap: #00B4D8;
+  --status:   var(--green);
+  --status-dim: var(--green-dim);
+  --radius:   16px;
+  --max-w:    520px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ───────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── TOP BAR ─────────────────────────────────────────────────── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(11,15,14,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-brand {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.brand-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--status);
+  animation: breathe 2s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.4); opacity: 0.7; }
+}
+.topbar-right {
+  font-size: 12px; color: var(--muted); font-weight: 400;
+}
+.topbar-right a { color: var(--innowrap); text-decoration: none; }
+.topbar-right a:hover { text-decoration: underline; }
+
+/* ── MAIN LAYOUT ─────────────────────────────────────────────── */
+main {
+  position: relative; z-index: 1;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 80px 20px 60px;
+}
+
+/* ── FADE IN ─────────────────────────────────────────────────── */
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+  opacity: 0;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SCREEN MANAGEMENT ───────────────────────────────────────── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── MULTILINGUAL STRIP ──────────────────────────────────────── */
+.lang-strip {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 32px;
+}
+.lang-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* ── SETUP SCREEN ────────────────────────────────────────────── */
+.setup-hero {
+  margin-bottom: 36px;
+}
+.setup-hero .eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--status);
+  margin-bottom: 12px;
+}
+.setup-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 8vw, 44px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.setup-hero h1 em {
+  font-style: italic;
+  color: var(--status);
+}
+.setup-hero p {
+  font-size: 15px; color: var(--muted); line-height: 1.6;
+}
+
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.form-group { margin-bottom: 20px; }
+.form-group:last-child { margin-bottom: 0; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 400px) { .form-row { grid-template-columns: 1fr; } }
+
+label {
+  display: block;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+input[type="text"], textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 16px;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+input[type="text"]:focus, textarea:focus {
+  border-color: var(--status);
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+}
+input[type="text"]::placeholder, textarea::placeholder {
+  color: var(--muted);
+  font-weight: 300;
+}
+textarea {
+  resize: none; height: 90px; line-height: 1.5;
+}
+
+.char-count {
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--status);
+  color: #000;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 8px;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(34,197,94,0.3);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.disclaimer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 16px;
+}
+
+/* ── STATUS BAR ──────────────────────────────────────────────── */
+.status-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--status);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.status-bar-left {
+  display: flex; align-items: center; gap: 10px;
+}
+.status-bar-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--status);
+  animation: breathe 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.status-bar-label {
+  font-weight: 600; font-size: 14px;
+  color: var(--status);
+  transition: color 0.2s;
+}
+.status-bar-time {
+  font-size: 11px; color: var(--muted);
+}
+
+/* ── SIGNAL CARD ─────────────────────────────────────────────── */
+.signal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+/* glow behind card */
+.signal-card::before {
+  content: '';
+  position: absolute;
+  top: -60px; left: 50%; transform: translateX(-50%);
+  width: 300px; height: 200px;
+  background: radial-gradient(circle, var(--status) 0%, transparent 70%);
+  opacity: 0.06;
+  pointer-events: none;
+  transition: background 0.2s;
+}
+
+.card-inner { padding: 28px; }
+
+.card-name {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(26px, 7vw, 36px);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.card-location {
+  font-size: 14px; color: var(--muted);
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.big-status {
+  background: var(--surface2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.big-status-emoji { font-size: 48px; display: block; margin-bottom: 8px; }
+.big-status-label {
+  font-size: 22px; font-weight: 700;
+  color: var(--status);
+  transition: color 0.2s;
+  margin-bottom: 6px;
+}
+.big-status-multi {
+  font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.8;
+}
+
+.meta-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 20px;
+}
+.meta-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.meta-chip-label {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 4px;
+}
+.meta-chip-value {
+  font-size: 13px; font-weight: 500; color: var(--text);
+}
+
+.personal-message {
+  background: var(--surface2);
+  border-left: 3px solid var(--status);
+  border-radius: 0 10px 10px 0;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--muted);
+  transition: border-color 0.2s;
+  display: none;
+}
+.personal-message.visible { display: block; }
+
+.timestamp {
+  font-size: 11px; color: var(--muted);
+  text-align: center; margin-bottom: 4px;
+}
+
+/* ── SHARE BUTTONS ───────────────────────────────────────────── */
+.share-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.btn-share {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, background 0.2s;
+  text-decoration: none;
+}
+.btn-share:hover {
+  transform: translateY(-1px);
+  border-color: var(--status);
+  background: rgba(34,197,94,0.08);
+}
+.btn-share.whatsapp:hover { border-color: #25D366; background: rgba(37,211,102,0.08); }
+.btn-share.image-btn:hover { border-color: var(--innowrap); background: rgba(0,180,216,0.08); }
+.btn-share.full-width { grid-column: 1/-1; }
+
+/* ── STATUS UPDATER ──────────────────────────────────────────── */
+.status-updater {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.updater-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 14px;
+}
+.status-options {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 16px;
+}
+.status-option {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 8px;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Outfit', sans-serif;
+  color: var(--muted);
+}
+.status-option .opt-emoji { font-size: 24px; }
+.status-option .opt-label { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+.status-option.selected-safe   { border-color: var(--green); background: rgba(34,197,94,0.1); color: var(--green); }
+.status-option.selected-uncertain { border-color: var(--amber); background: rgba(245,158,11,0.1); color: var(--amber); }
+.status-option.selected-help   { border-color: var(--red); background: rgba(239,68,68,0.1); color: var(--red); }
+.status-option:hover { border-color: var(--text); }
+
+.btn-update {
+  width: 100%;
+  padding: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-update:hover {
+  background: var(--status);
+  color: #000;
+  border-color: var(--status);
+}
+
+/* ── FAMILY VIEW ─────────────────────────────────────────────── */
+.family-view-btn {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+.family-view-btn:hover { border-color: var(--text); color: var(--text); }
+
+/* ── FAMILY SCREEN ───────────────────────────────────────────── */
+.family-header {
+  text-align: center;
+  padding: 32px 20px 20px;
+}
+.pulse-ring-wrap {
+  width: 140px; height: 140px;
+  position: relative; margin: 0 auto 24px;
+  display: flex; align-items: center; justify-content: center;
+}
+.pulse-ring {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--status);
+  animation: pulseRing 2s ease-in-out infinite;
+  transition: border-color 0.2s;
+}
+.pulse-ring-2 {
+  animation-delay: 0.5s;
+  opacity: 0.5;
+}
+@keyframes pulseRing {
+  0%   { transform: scale(0.9); box-shadow: 0 0 0 0 var(--status); opacity: 1; }
+  70%  { transform: scale(1.1); box-shadow: 0 0 0 20px transparent; opacity: 0.4; }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 transparent; opacity: 1; }
+}
+.pulse-emoji {
+  font-size: 64px;
+  position: relative; z-index: 1;
+}
+.family-name {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 8vw, 40px);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.family-status-label {
+  font-size: 20px; font-weight: 600;
+  color: var(--status); margin-bottom: 8px;
+}
+.family-subline {
+  font-size: 14px; color: var(--muted);
+}
+
+.family-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+/* ── TIMELINE ────────────────────────────────────────────────── */
+.timeline { list-style: none; }
+.timeline-item {
+  display: flex; gap: 14px;
+  padding-bottom: 20px;
+  position: relative;
+}
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 11px; top: 24px; bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.timeline-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  position: relative; z-index: 1;
+}
+.timeline-dot.safe { border-color: var(--green); background: rgba(34,197,94,0.1); }
+.timeline-dot.uncertain { border-color: var(--amber); background: rgba(245,158,11,0.1); }
+.timeline-dot.help { border-color: var(--red); background: rgba(239,68,68,0.1); }
+.timeline-body { flex: 1; }
+.timeline-status {
+  font-size: 13px; font-weight: 600; color: var(--text);
+}
+.timeline-time { font-size: 11px; color: var(--muted); }
+
+.reassurance {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+/* ── BACK BUTTON ─────────────────────────────────────────────── */
+.btn-back {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none;
+  color: var(--muted); font-family: 'Outfit', sans-serif;
+  font-size: 13px; cursor: pointer;
+  margin-bottom: 20px;
+  padding: 0;
+  transition: color 0.2s;
+}
+.btn-back:hover { color: var(--text); }
+
+/* ── IMAGE MODAL ─────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 480px;
+  width: 100%;
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-overlay.open .modal-box { transform: translateY(0); }
+.modal-title {
+  font-size: 14px; font-weight: 600; margin-bottom: 16px;
+  color: var(--muted);
+}
+#previewCanvas {
+  width: 100%; aspect-ratio: 1;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  display: block;
+}
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-modal-close {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 50%; width: 32px; height: 32px;
+  color: var(--muted); font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.2s;
+}
+.modal-box { position: relative; }
+.btn-modal-close:hover { color: var(--text); }
+
+/* ── TOAST ───────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 12px 24px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text);
+  z-index: 300;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── FOOTER ──────────────────────────────────────────────────── */
+footer {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 24px 20px 40px;
+  font-size: 12px; color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+  max-width: var(--max-w);
+  margin-left: auto; margin-right: auto;
+}
+footer a { color: var(--innowrap); text-decoration: none; }
+footer .cta-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--innowrap);
+  font-weight: 500;
+}
+
+/* ── STATUS COLOUR TRANSITIONS ───────────────────────────────── */
+.status-transition * { transition: color 0.2s, border-color 0.2s, background 0.2s; }
+</style>
 </head>
-
 <body>
 
-    <!-- Top Bar -->
-    <div class="top-bar">
-        Free tool by <a href="https://innowrap.com" target="_blank" style="margin-left:4px;">Innowrap Technologies</a>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-dot"></div>
+    SafeSignal
+  </div>
+  <div class="topbar-right">
+    Free tool by <a href="https://innowrap.com" target="_blank">Innowrap Technologies</a>
+  </div>
+</div>
+
+<main>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SCREEN 1: SETUP                                 -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div id="screen-setup" class="screen active fade-in">
+    <div class="setup-hero">
+      <div class="eyebrow">🛡️ Crisis Safety Signal</div>
+      <h1>Let your loved ones<br>know you're <em>safe.</em></h1>
+      <p>One tap. A shareable link. Instant peace of mind — wherever in the world your family is.</p>
     </div>
 
-    <div class="container">
-        <!-- SCREEN 1: SETUP -->
-        <main id="screen-setup" class="screen active">
-            <h1 class="hero-title serif italic-emphasis">Let your loved ones know you're safe.</h1>
-            <p class="hero-subtitle">Instantly generate a verifiable safety signal card to share with family worldwide.
-            </p>
-
-            <div class="chip-container mb-4">
-                <div class="chip">I'm Safe</div>
-                <div class="chip" dir="rtl">أنا بخير</div>
-                <div class="chip">मैं सुरक्षित हूँ</div>
-                <div class="chip">Я в безопасности</div>
-                <div class="chip">Je suis en sécurité</div>
-                <div class="chip">Estoy bien</div>
-                <div class="chip">我很安全</div>
-            </div>
-
-            <form id="setup-form" onsubmit="handleGenerate(event)">
-                <div class="form-group mb-3">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" required>
-                </div>
-
-                <div class="input-row">
-                    <div class="form-group">
-                        <label for="currentCity">Currently In (City)</label>
-                        <input type="text" id="currentCity" placeholder="e.g. Kyiv" required autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <label for="familyCity">Family Is In (City)</label>
-                        <input type="text" id="familyCity" placeholder="e.g. London" required autocomplete="off">
-                    </div>
-                </div>
-
-                <div class="form-group mb-4">
-                    <label for="personalMessage">Personal Message <span class="text-muted">(Optional)</span></label>
-                    <textarea id="personalMessage"
-                        placeholder="Optional message to your family — they will see this on your safety card."
-                        maxlength="200"></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Generate My Safety Signal</button>
-            </form>
-
-            <div class="disclaimer-box mb-2">
-                <strong>No account. No app. No data stored on servers.</strong><br>
-                Works in any country — any language.
-            </div>
-        </main>
-
-        <!-- SCREEN 2: SENDER VIEW -->
-        <main id="screen-sender" class="screen status-safe">
-            <div class="status-bar" id="sender-status-bar">
-                🟢 I am safe • Last updated just now
-            </div>
-
-            <button class="btn-back mt-2" onclick="showScreen('screen-setup')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
-                Back to Edit
-            </button>
-
-            <h2 class="signal-name serif" id="sender-name">Name placeholder</h2>
-            <div class="signal-location">
-                📍 <span id="sender-current-city">City</span> &rarr; Family in <span id="sender-family-city">City</span>
-            </div>
-
-            <div class="status-block">
-                <div class="status-glow"></div>
-                <div class="status-emoji" id="sender-emoji">✅</div>
-                <div class="status-label" id="sender-status-label">I AM SAFE</div>
-                <div class="status-sub">أنا بخير • मैं सुरक्षित हूँ • Я в безопасности</div>
-            </div>
-
-            <div class="message-box" id="sender-message-box" style="display: none;">
-                <span class="serif" id="sender-message">Message placeholder</span>
-            </div>
-
-            <div class="metadata-grid">
-                <div class="meta-item">
-                    <div class="meta-label">Last Updated</div>
-                    <div class="meta-val" id="sender-time">Just now</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Signal Views</div>
-                    <div class="meta-val">1 (You)</div>
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <button class="btn btn-whatsapp" onclick="shareWhatsApp()">
-                    <span class="btn-icon">💬</span> WhatsApp
-                </button>
-                <button class="btn" onclick="copyLink()">
-                    <span class="btn-icon">🔗</span> Copy Link
-                </button>
-            </div>
-
-            <button class="btn mb-4" onclick="shareImage()">
-                <span class="btn-icon">📸</span> Share as Image
-            </button>
-
-            <div class="status-selector">
-                <h3 class="serif">Update Your Status</h3>
-                <div class="radio-group">
-                    <label class="radio-label">
-                        <input type="radio" name="statusUpdate" value="safe" checked onchange="previewStatusChange()">
-                        🟢 Safe &mdash; Situation under control
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="statusUpdate" value="uncertain" onchange="previewStatusChange()">
-                        🟡 Uncertain &mdash; Monitoring situation
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="statusUpdate" value="help" onchange="previewStatusChange()">
-                        🔴 Need Help &mdash; Require assistance
-                    </label>
-                </div>
-                <button class="btn" onclick="updateStatus()">Send Updated Signal</button>
-            </div>
-
-            <button class="btn btn-primary mt-2" onclick="previewFamilyView()">Preview Family View &rarr;</button>
-        </main>
-
-        <!-- SCREEN 3: RECEIVER VIEW -->
-        <main id="screen-receiver" class="screen status-safe">
-            <div class="status-bar" id="recv-status-bar">
-                🟢 I am safe • Last updated just now
-            </div>
-
-            <div class="pulse-ring-container">
-                <div class="pulse-ring" id="recv-emoji">✅</div>
-            </div>
-
-            <h2 class="receiver-headline serif" id="recv-headline">Name is safe ✅</h2>
-            <div class="receiver-subline" id="recv-subline">Last signal from City</div>
-
-            <div class="message-box mt-2" id="recv-message-box" style="display: none;">
-                <span class="serif" id="recv-message">Message placeholder</span>
-            </div>
-
-            <h3 class="serif mt-4 mb-2" style="font-size: 1.2rem;">Location Updates</h3>
-            <div class="timeline" id="recv-timeline">
-                <!-- Timeline items injected via JS -->
-            </div>
-
-            <div class="reassurance-note">
-                <strong>Bookmark this page for live updates.</strong><br>
-                No app needed. Works on any phone, anywhere.
-            </div>
-
-            <button class="btn mt-4" onclick="showScreen('screen-sender')">&larr; Back to Sender View (Dev
-                Only)</button>
-        </main>
+    <div class="lang-strip">
+      <span class="lang-chip">I'm Safe</span>
+      <span class="lang-chip">أنا بخير</span>
+      <span class="lang-chip">मैं सुरक्षित हूँ</span>
+      <span class="lang-chip">Я в безопасности</span>
+      <span class="lang-chip">Je suis en sécurité</span>
+      <span class="lang-chip">Estoy bien</span>
+      <span class="lang-chip">我很安全</span>
     </div>
 
-    <!-- ════════════════════════════════════════════════════ -->
-    <!-- IMAGE CARD MODAL                                     -->
-    <!-- ════════════════════════════════════════════════════ -->
-    <div class="modal-overlay" id="modal-image">
-        <div class="modal-box">
-            <button class="btn-modal-close" onclick="closeModal()">×</button>
-            <div class="modal-title">📤 Share as Image Card</div>
-            <canvas id="previewCanvas" width="1080" height="1080"></canvas>
-            <div class="modal-actions">
-                <button class="btn" onclick="downloadImage()">
-                    <span class="btn-icon">📥</span> Save Image
-                </button>
-                <button class="btn btn-whatsapp" onclick="shareWhatsAppImage()">
-                    <span class="btn-icon">💬</span> WhatsApp
-                </button>
-            </div>
+    <div class="form-card">
+      <div class="form-group">
+        <label for="input-name">Your Full Name</label>
+        <input type="text" id="input-name" placeholder="e.g. Maria Santos" autocomplete="name">
+      </div>
+
+      <div class="form-group form-row">
+        <div>
+          <label for="input-city-current">You Are Currently In</label>
+          <input type="text" id="input-city-current" placeholder="Your city">
         </div>
+        <div>
+          <label for="input-city-family">Your Family Is In</label>
+          <input type="text" id="input-city-family" placeholder="Family's city">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="input-message">Personal Message <span style="font-weight:300;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea id="input-message" placeholder="Optional message to your family — they will see this on your safety card." maxlength="200"></textarea>
+        <div class="char-count"><span id="char-count">0</span> / 200</div>
+      </div>
+
+      <button class="btn-primary" id="btn-generate">Generate My Safety Signal →</button>
     </div>
 
-    <!-- TOAST -->
-    <div class="toast" id="toast"></div>
+    <p class="disclaimer">No account. No app. No data stored on servers.<br>Works in any country — any language.</p>
+  </div>
 
-    <!-- Footer -->
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SCREEN 2: SIGNAL CARD (SENDER VIEW)             -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div id="screen-signal" class="screen">
+    <div class="status-bar status-transition">
+      <div class="status-bar-left">
+        <div class="status-bar-dot"></div>
+        <div class="status-bar-label" id="sb-label">Safe</div>
+      </div>
+      <div class="status-bar-time" id="sb-time">—</div>
+    </div>
+
+    <div class="signal-card status-transition">
+      <div class="card-inner">
+        <div class="card-name" id="card-name">—</div>
+        <div class="card-location">
+          <span>📍</span>
+          <span id="card-location-text">—</span>
+        </div>
+
+        <div class="big-status">
+          <span class="big-status-emoji" id="card-emoji">🟢</span>
+          <div class="big-status-label" id="card-status-label">I AM SAFE</div>
+          <div class="big-status-multi" id="card-status-multi">
+            أنا بخير &nbsp;·&nbsp; मैं सुरक्षित हूँ<br>
+            Я в безопасности &nbsp;·&nbsp; Je suis en sécurité
+          </div>
+        </div>
+
+        <div class="meta-grid">
+          <div class="meta-chip">
+            <div class="meta-chip-label">Last Updated</div>
+            <div class="meta-chip-value" id="meta-updated">—</div>
+          </div>
+          <div class="meta-chip">
+            <div class="meta-chip-label">Status</div>
+            <div class="meta-chip-value" id="meta-status">Safe 🟢</div>
+          </div>
+          <div class="meta-chip">
+            <div class="meta-chip-label">From</div>
+            <div class="meta-chip-value" id="meta-city">—</div>
+          </div>
+          <div class="meta-chip">
+            <div class="meta-chip-label">Signal Views</div>
+            <div class="meta-chip-value" id="meta-views">—</div>
+          </div>
+        </div>
+
+        <div class="personal-message" id="card-personal-message"></div>
+        <div class="timestamp" id="card-timestamp"></div>
+      </div>
+    </div>
+
+    <!-- Share buttons -->
+    <div class="share-row">
+      <button class="btn-share whatsapp" id="btn-whatsapp">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </button>
+      <button class="btn-share" id="btn-copy">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy Link
+      </button>
+    </div>
+    <div class="share-row">
+      <button class="btn-share image-btn full-width" id="btn-share-image">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Share as Image Card
+      </button>
+    </div>
+
+    <!-- Status updater -->
+    <div class="status-updater">
+      <div class="updater-label">Update Your Status</div>
+      <div class="status-options">
+        <button class="status-option selected-safe" data-status="safe" onclick="selectStatus('safe')">
+          <span class="opt-emoji">🟢</span>
+          <span class="opt-label">Safe</span>
+        </button>
+        <button class="status-option" data-status="uncertain" onclick="selectStatus('uncertain')">
+          <span class="opt-emoji">🟡</span>
+          <span class="opt-label">Uncertain</span>
+        </button>
+        <button class="status-option" data-status="help" onclick="selectStatus('help')">
+          <span class="opt-emoji">🔴</span>
+          <span class="opt-label">Need Help</span>
+        </button>
+      </div>
+      <button class="btn-update" onclick="sendUpdate()">Send Updated Signal</button>
+    </div>
+
+    <button class="family-view-btn" onclick="startNewSignal()">➕ Create New Signal</button>
+    <button class="family-view-btn" onclick="showFamilyView()">👁️ Preview Family View</button>
+
     <footer>
-        <div class="mb-1">Built by <a href="https://innowrap.com" target="_blank">Innowrap Technologies</a></div>
-        <div>Need a crisis tool for your org? <a href="https://innowrap.com/contact" target="_blank">Talk to us
-                &rarr;</a></div>
+      Built by <a href="https://innowrap.com" target="_blank">Innowrap Technologies</a><br>
+      <a class="cta-link" href="https://innowrap.com" target="_blank">Need a crisis tool for your org? Talk to us →</a>
     </footer>
-
-    <!-- Logic -->
-    <script>
-        // State
-        const state = {
-            name: '',
-            currentCity: '',
-            familyCity: '',
-            message: '',
-            status: 'safe', // 'safe', 'uncertain', 'help'
-            lastUpdated: null,
-            history: [] // {status, time}
-        };
-
-        const statusConfig = {
-            'safe': { colorClass: 'status-safe', emoji: '✅', label: 'I AM SAFE', bar: '🟢 I am safe' },
-            'uncertain': { colorClass: 'status-uncertain', emoji: '⚠️', label: 'MONITORING SITUATION', bar: '🟡 Uncertain' },
-            'help': { colorClass: 'status-help', emoji: '🚨', label: 'I NEED HELP', bar: '🔴 Need Help' }
-        };
-
-        // Navigation
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            window.scrollTo(0, 0);
-        }
-
-        // Form Submission
-        function handleGenerate(e) {
-            e.preventDefault();
-
-            state.name = document.getElementById('fullName').value.trim();
-            state.currentCity = document.getElementById('currentCity').value.trim();
-            state.familyCity = document.getElementById('familyCity').value.trim();
-            state.message = document.getElementById('personalMessage').value.trim();
-            state.status = 'safe'; // Default to safe initially
-            state.lastUpdated = new Date();
-            state.history = [{ status: state.status, time: state.lastUpdated }];
-
-            renderSenderView();
-            showScreen('screen-sender');
-        }
-
-        // Formatting Helpers
-        function formatTime(date) {
-            return new Intl.DateTimeFormat('default', {
-                hour: 'numeric', minute: '2-digit',
-                day: 'numeric', month: 'short'
-            }).format(date);
-        }
-
-        // Render Screen 2
-        function renderSenderView() {
-            const screen = document.getElementById('screen-sender');
-            const conf = statusConfig[state.status];
-
-            // Apply theme class
-            screen.className = `screen active ${conf.colorClass}`;
-
-            document.getElementById('sender-name').textContent = state.name;
-            document.getElementById('sender-current-city').textContent = state.currentCity;
-            document.getElementById('sender-family-city').textContent = state.familyCity;
-
-            // Emoji and Label
-            document.getElementById('sender-emoji').textContent = conf.emoji;
-            document.getElementById('sender-status-label').textContent = conf.label;
-
-            // Status Bar
-            const timeStr = formatTime(state.lastUpdated);
-            document.getElementById('sender-status-bar').textContent = `${conf.bar} • Last updated ${timeStr}`;
-            document.getElementById('sender-time').textContent = timeStr;
-
-            // Message
-            const msgBox = document.getElementById('sender-message-box');
-            if (state.message) {
-                document.getElementById('sender-message').textContent = `"${state.message}"`;
-                msgBox.style.display = 'block';
-            } else {
-                msgBox.style.display = 'none';
-            }
-
-            // Sync radio button
-            document.querySelector(`input[name="statusUpdate"][value="${state.status}"]`).checked = true;
-        }
-
-        // Status Update Logic
-        function previewStatusChange() {
-            // Optional: visually preview before committing
-        }
-
-        function updateStatus() {
-            const newStatus = document.querySelector('input[name="statusUpdate"]:checked').value;
-            if (newStatus !== state.status) {
-                state.status = newStatus;
-                state.lastUpdated = new Date();
-                state.history.unshift({ status: state.status, time: state.lastUpdated });
-
-                // Keep URL address bar updated so copying from it directly yields the right link
-                const newLink = generateShareLink();
-                window.history.replaceState(null, '', newLink);
-
-                renderSenderView();
-                showToast('✅ Status updated — link refreshed!');
-            }
-        }
-
-        // Render Screen 3
-        function renderReceiverView() {
-            const screen = document.getElementById('screen-receiver');
-            const conf = statusConfig[state.status];
-
-            // Apply theme class
-            screen.className = `screen active ${conf.colorClass}`;
-
-            // Pulse Ring & Headline
-            document.getElementById('recv-emoji').textContent = conf.emoji;
-            document.getElementById('recv-headline').textContent = `${state.name} is ${state.status} ${conf.emoji}`;
-            document.getElementById('recv-subline').textContent = `Last signal from ${state.currentCity}`;
-
-            // Status Bar
-            const timeStr = formatTime(state.lastUpdated);
-            document.getElementById('recv-status-bar').textContent = `${conf.bar} • Last updated ${timeStr}`;
-
-            // Message
-            const msgBox = document.getElementById('recv-message-box');
-            if (state.message) {
-                document.getElementById('recv-message').textContent = `"${state.message}"`;
-                msgBox.style.display = 'block';
-            } else {
-                msgBox.style.display = 'none';
-            }
-
-            // Render Timeline
-            const timeline = document.getElementById('recv-timeline');
-            timeline.innerHTML = ''; // clear existing
-
-            state.history.forEach((h, idx) => {
-                const confH = statusConfig[h.status];
-                const strTime = formatTime(h.time);
-
-                let desc = `Status updated to ${confH.label}`;
-                if (idx === state.history.length - 1) {
-                    desc = `Safety signal created in ${state.currentCity}`;
-                }
-
-                const itemHTML = `
-                    <div class="timeline-item">
-                        <div class="timeline-dot" style="background: var(--${h.status === 'safe' ? 'green' : h.status === 'uncertain' ? 'amber' : 'red'});"></div>
-                        <div class="timeline-time">${strTime}</div>
-                        <div class="timeline-content">${confH.emoji} ${desc}</div>
-                    </div>
-                `;
-                timeline.insertAdjacentHTML('beforeend', itemHTML);
-            });
-        }
-
-        // Link Generation Logic
-        function generateShareLink() {
-            // Encode state to Base64 to make it URL-safe without a backend
-            const payload = {
-                n: state.name,
-                c: state.currentCity,
-                f: state.familyCity,
-                m: state.message,
-                s: state.status,
-                t: state.lastUpdated.getTime(),
-                h: state.history.map(x => ({ s: x.status, t: x.time.getTime() }))
-            };
-            const b64 = btoa(encodeURIComponent(JSON.stringify(payload)));
-            const url = new URL(window.location.href);
-            // Clear any existing query params and set just the data
-            url.search = '';
-            url.searchParams.set('data', b64);
-            return url.toString();
-        }
-
-        // ── TOAST ────────────────────────────────────────────────────────
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        // ── SHARING ACTIONS ──────────────────────────────────────────────
-        function shareWhatsApp() {
-            const link = generateShareLink();
-            const timeStr = formatTime(state.lastUpdated);
-
-            let statusText = state.status === 'safe' ? '🟢 *' + state.name + ' is SAFE*'
-                : state.status === 'uncertain' ? '🟡 *' + state.name + ' is MONITORING SITUATION*'
-                    : '🔴 *' + state.name + ' NEEDS HELP*';
-
-            let msg = `${statusText} — Live Safety Signal\n\n`;
-            msg += `📍 Currently in: ${state.currentCity}\n`;
-            msg += `👨‍👩‍👧 Family in: ${state.familyCity}\n`;
-            msg += `🕛 Last updated: ${timeStr}\n\n`;
-            msg += `Track live safety status:\n👉 ${link}\n\n`;
-            msg += `_SafeSignal — Free crisis tool by Innowrap Technologies_`;
-
-            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function copyLink() {
-            const link = generateShareLink();
-            navigator.clipboard.writeText(link).then(() => {
-                showToast('🔗 Link copied to clipboard!');
-            }).catch(err => {
-                console.error('Could not copy link', err);
-                showToast('⚠️ Could not copy — please copy manually.');
-            });
-        }
-
-        // ── IMAGE CARD MODAL ─────────────────────────────────────────────
-        function shareImage() {
-            drawImageCard();
-            document.getElementById('modal-image').classList.add('open');
-        }
-
-        function closeModal() {
-            document.getElementById('modal-image').classList.remove('open');
-        }
-
-        document.getElementById('modal-image').addEventListener('click', e => {
-            if (e.target === document.getElementById('modal-image')) closeModal();
-        });
-
-        function drawImageCard() {
-            const canvas = document.getElementById('previewCanvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 1080;
-            canvas.height = 1080;
-
-            const conf = statusConfig[state.status];
-
-            // Background
-            ctx.fillStyle = '#141A18';
-            ctx.fillRect(0, 0, 1080, 1080);
-
-            // Gradient Glow
-            const gradient = ctx.createRadialGradient(540, 200, 50, 540, 200, 600);
-            const colorHex = state.status === 'safe' ? '#22C55E' : state.status === 'uncertain' ? '#F59E0B' : '#EF4444';
-
-            // Convert hex to rgba for gradient
-            const r = parseInt(colorHex.slice(1, 3), 16);
-            const g = parseInt(colorHex.slice(3, 5), 16);
-            const b = parseInt(colorHex.slice(5, 7), 16);
-
-            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.25)`);
-            gradient.addColorStop(1, 'rgba(20, 26, 24, 0)');
-
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 1080, 1080);
-
-            // Subtle Grid lines
-            ctx.strokeStyle = 'rgba(255,255,255,0.025)';
-            ctx.lineWidth = 1;
-            for (let x = 0; x <= 1080; x += 72) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1080); ctx.stroke();
-            }
-            for (let y = 0; y <= 1080; y += 72) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1080, y); ctx.stroke();
-            }
-
-            // Top accent line
-            const topGrad = ctx.createLinearGradient(0, 0, 1080, 0);
-            topGrad.addColorStop(0, 'transparent');
-            topGrad.addColorStop(0.5, colorHex);
-            topGrad.addColorStop(1, 'transparent');
-            ctx.fillStyle = topGrad;
-            ctx.fillRect(0, 0, 1080, 5);
-
-            // Branding Top Left
-            ctx.fillStyle = '#F0F4F2';
-            ctx.font = 'bold 36px Fraunces, serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('SafeSignal', 60, 80);
-
-            // Timestamp Top Right
-            ctx.fillStyle = '#6B7C75';
-            ctx.font = '32px Outfit, sans-serif';
-            ctx.textAlign = 'right';
-            ctx.fillText(formatTime(state.lastUpdated), 1020, 80);
-
-            // Emoji
-            ctx.font = '170px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(conf.emoji, 540, 350);
-
-            // Status Label
-            ctx.fillStyle = colorHex;
-            ctx.font = 'bold 76px Outfit, sans-serif';
-            ctx.fillText(conf.label, 540, 480);
-
-            // Multilingual
-            ctx.fillStyle = '#6B7C75';
-            ctx.font = '32px Outfit, sans-serif';
-            ctx.fillText('أنا بخير • मैं सुरक्षित हूँ • Я в безопасности', 540, 540);
-
-            // Divider
-            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(100, 620);
-            ctx.lineTo(980, 620);
-            ctx.stroke();
-
-            // Name
-            ctx.fillStyle = '#F0F4F2';
-            ctx.font = 'bold 84px Fraunces, serif';
-            ctx.fillText(state.name, 540, 740);
-
-            // Location
-            ctx.font = '40px Outfit, sans-serif';
-            ctx.fillStyle = '#6B7C75';
-            ctx.fillText(`📍 ${state.currentCity}  ›  Family in ${state.familyCity}`, 540, 810);
-
-            // Message Box (if any)
-            if (state.message) {
-                ctx.fillStyle = 'rgba(255,255,255,0.03)';
-                ctx.beginPath();
-                ctx.roundRect(100, 850, 880, 100, 16);
-                ctx.fill();
-
-                ctx.fillStyle = '#F0F4F2';
-                ctx.font = 'italic 36px Fraunces, serif';
-                // Very basic truncation for Canvas to prevent wrapping overflow
-                let msgPrint = `"${state.message}"`;
-                if (msgPrint.length > 55) msgPrint = msgPrint.substring(0, 52) + '..."';
-                ctx.fillText(msgPrint, 540, 910);
-            }
-
-            // Bottom Strip
-            ctx.fillStyle = '#0B0F0E';
-            ctx.fillRect(0, 1000, 1080, 80);
-
-            ctx.fillStyle = '#6B7C75';
-            ctx.font = '28px Outfit, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('safesignal.innowrap.com • Free • No app needed • Works worldwide', 540, 1050);
-        }
-
-        function downloadImage() {
-            const canvas = document.getElementById('previewCanvas');
-            const link = document.createElement('a');
-            link.download = `safesignal-${state.name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            showToast('📥 Image saved!');
-        }
-
-        function shareWhatsAppImage() {
-            downloadImage();
-            const timeStr = formatTime(state.lastUpdated);
-            const conf = statusConfig[state.status];
-            const url = generateShareLink();
-            const text = `${conf.emoji} *${state.name} is ${conf.label}* — I've generated my safety card image. Hit "Send Image" in WhatsApp to attach the downloaded card, and view my live status here: 👉 ${url}\n\n_SafeSignal — Free crisis tool_`;
-            setTimeout(() => window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'), 500);
-        }
-
-        function previewFamilyView() {
-            renderReceiverView();
-            showScreen('screen-receiver');
-        }
-
-        // Initialization / Routing
-        function initPlacesFallback() {
-            try {
-                if (typeof google === 'object' && typeof google.maps === 'object') {
-                    const opts = { types: ['(cities)'] };
-
-                    const cw = new google.maps.places.Autocomplete(document.getElementById('currentCity'), opts);
-                    const fw = new google.maps.places.Autocomplete(document.getElementById('familyCity'), opts);
-
-                    cw.addListener('place_changed', () => {
-                        const place = cw.getPlace();
-                        if (place.name) document.getElementById('currentCity').value = place.name;
-                    });
-
-                    fw.addListener('place_changed', () => {
-                        const place = fw.getPlace();
-                        if (place.name) document.getElementById('familyCity').value = place.name;
-                    });
-                }
-            } catch (e) {
-                console.warn("Places initialization failed", e);
-            }
-        }
-
-        // To support both the global callback and direct call if needed
-        window.initPlacesFallback = initPlacesFallback;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const data = params.get('data');
-
-            if (data) {
-                // If accessed via link, decode and show Receiver view
-                try {
-                    const decodedStr = decodeURIComponent(atob(data));
-                    const payload = JSON.parse(decodedStr);
-
-                    state.name = payload.n;
-                    state.currentCity = payload.c;
-                    state.familyCity = payload.f;
-                    state.message = payload.m;
-                    state.status = payload.s;
-                    state.lastUpdated = new Date(payload.t);
-                    state.history = payload.h.map(x => ({ status: x.s, time: new Date(x.t) }));
-
-                    renderReceiverView();
-                    showScreen('screen-receiver');
-                } catch (e) {
-                    console.error("Failed to parse signal data", e);
-                    showScreen('screen-setup');
-                }
-            } else {
-                showScreen('screen-setup');
-            }
-        });
-
-    </script>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SCREEN 3: FAMILY VIEW                           -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div id="screen-family" class="screen">
+    <button class="btn-back" onclick="goBack()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Signal
+    </button>
+
+    <div class="family-header">
+      <div class="pulse-ring-wrap">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring pulse-ring-2"></div>
+        <div class="pulse-emoji" id="family-emoji">🟢</div>
+      </div>
+      <div class="family-name" id="family-name">—</div>
+      <div class="family-status-label" id="family-status-label">is safe ✅</div>
+      <div class="family-subline" id="family-subline">Last signal from —</div>
+    </div>
+
+    <div class="family-card status-transition">
+      <div class="status-bar" style="margin-bottom:16px">
+        <div class="status-bar-left">
+          <div class="status-bar-dot"></div>
+          <div class="status-bar-label" id="family-sb-label">Safe</div>
+        </div>
+        <div class="status-bar-time" id="family-sb-time">—</div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div class="meta-chip-label" style="margin-bottom:4px">Name</div>
+        <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700" id="family-fullname">—</div>
+      </div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:16px">
+        📍 <span id="family-location">—</span>
+      </div>
+
+      <div class="personal-message" id="family-personal-message" style="margin-bottom:16px"></div>
+
+      <div class="meta-chip-label" style="margin-bottom:12px">Update Timeline</div>
+      <ul class="timeline" id="family-timeline"></ul>
+    </div>
+
+    <div class="reassurance">
+      Bookmark this page for live updates.<br>
+      No app needed. Works on any phone, anywhere.
+    </div>
+
+    <footer>
+      Built by <a href="https://innowrap.com" target="_blank">Innowrap Technologies</a><br>
+      <a class="cta-link" href="https://innowrap.com" target="_blank">Need a crisis tool for your org? Talk to us →</a>
+    </footer>
+  </div>
+
+</main>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- IMAGE CARD MODAL                                     -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-image">
+  <div class="modal-box">
+    <button class="btn-modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">📤 Share as Image Card</div>
+    <canvas id="previewCanvas" width="1080" height="1080"></canvas>
+    <div class="modal-actions">
+      <button class="btn-share" onclick="downloadImage()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save Image
+      </button>
+      <button class="btn-share whatsapp" onclick="shareWhatsAppImage()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────
+const state = {
+  name: '',
+  cityCurrentIn: '',
+  cityFamilyIn: '',
+  message: '',
+  status: 'safe',   // safe | uncertain | help
+  timeline: [],
+  pendingStatus: 'safe',
+  views: Math.floor(Math.random() * 90) + 10,
+};
+
+const STATUS_CONFIG = {
+  safe:      { color: '#22C55E', dimColor: '#16A34A', emoji: '🟢', label: 'I AM SAFE',             multi: 'أنا بخير · मैं सुरक्षित हूँ\nЯ в безопасности · Je suis en sécurité', familyLabel: 'is safe ✅',             bar: 'Safe',       meta: 'Safe 🟢' },
+  uncertain: { color: '#F59E0B', dimColor: '#D97706', emoji: '🟡', label: 'MONITORING SITUATION',  multi: 'أراقب الوضع · स्थिति पर नज़र रख रहा/रही हूँ\nСлежу за обстановкой · Je surveille la situation', familyLabel: 'status: Uncertain ⚠️', bar: 'Uncertain', meta: 'Uncertain 🟡' },
+  help:      { color: '#EF4444', dimColor: '#DC2626', emoji: '🔴', label: 'I NEED HELP',            multi: 'أحتاج مساعدة · मुझे मदद चाहिए\nМне нужна помощь · J\'ai besoin d\'aide',      familyLabel: 'needs help 🆘',          bar: 'Need Help', meta: 'Need Help 🔴' },
+};
+
+// ── SCREEN MANAGEMENT ────────────────────────────────────────────
+let currentScreen = 'setup';
+let prevScreen = 'signal';
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  el.classList.add('active', 'fade-in');
+  setTimeout(() => el.classList.remove('fade-in'), 500);
+  currentScreen = id;
+}
+
+// ── CSS VAR HELPER ────────────────────────────────────────────────
+function applyStatusColors(status) {
+  const cfg = STATUS_CONFIG[status];
+  document.documentElement.style.setProperty('--status', cfg.color);
+  document.documentElement.style.setProperty('--status-dim', cfg.dimColor);
+}
+
+// ── SETUP ────────────────────────────────────────────────────────
+const msgInput = document.getElementById('input-message');
+msgInput.addEventListener('input', () => {
+  document.getElementById('char-count').textContent = msgInput.value.length;
+});
+
+function generateShareLink() {
+  const payload = {
+    n: state.name,
+    c: state.cityCurrentIn,
+    f: state.cityFamilyIn,
+    m: state.message,
+    s: state.status,
+    t: state.timeline.map(x => ({s: x.status, t: new Date(x.time).getTime()}))
+  };
+  const b64 = btoa(encodeURIComponent(JSON.stringify(payload)));
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.searchParams.set('data', b64);
+  return url.toString();
+}
+
+document.getElementById('btn-generate').addEventListener('click', () => {
+  const name  = document.getElementById('input-name').value.trim();
+  const curr  = document.getElementById('input-city-current').value.trim();
+  const fam   = document.getElementById('input-city-family').value.trim();
+  const msg   = document.getElementById('input-message').value.trim();
+
+  if (!name || !curr || !fam) {
+    showToast('⚠️ Please fill in your name and both cities.');
+    return;
+  }
+
+  state.name         = name;
+  state.cityCurrentIn = curr;
+  state.cityFamilyIn  = fam;
+  state.message       = msg;
+  state.status        = 'safe';
+  state.pendingStatus = 'safe';
+  state.timeline      = [];
+  state.views         = Math.floor(Math.random() * 90) + 10;
+
+  addTimelineEntry('safe');
+  applyStatusColors('safe');
+  renderSignalCard();
+
+  const newLink = generateShareLink();
+  window.history.replaceState(null, '', newLink);
+
+  showScreen('signal');
+});
+
+// ── RENDER SIGNAL CARD ────────────────────────────────────────────
+function renderSignalCard() {
+  const cfg = STATUS_CONFIG[state.status];
+  const now = formatTime(new Date());
+
+  document.getElementById('card-name').textContent = state.name;
+  document.getElementById('card-location-text').textContent =
+    `${state.cityCurrentIn} → Family in ${state.cityFamilyIn}`;
+
+  document.getElementById('sb-label').textContent = cfg.bar;
+  document.getElementById('sb-time').textContent  = 'Updated ' + now;
+
+  document.getElementById('card-emoji').textContent        = cfg.emoji;
+  document.getElementById('card-status-label').textContent = cfg.label;
+  document.getElementById('card-status-multi').innerHTML   = cfg.multi.replace('\n', '<br>');
+
+  document.getElementById('meta-updated').textContent = now;
+  document.getElementById('meta-status').textContent  = cfg.meta;
+  document.getElementById('meta-city').textContent    = state.cityCurrentIn;
+  document.getElementById('meta-views').textContent   = state.views + ' views';
+
+  const msgEl = document.getElementById('card-personal-message');
+  if (state.message) {
+    msgEl.textContent = '"' + state.message + '"';
+    msgEl.classList.add('visible');
+  } else {
+    msgEl.classList.remove('visible');
+  }
+
+  document.getElementById('card-timestamp').textContent =
+    'Signal generated: ' + formatFullTime(new Date());
+
+  renderFamilyView();
+}
+
+// ── STATUS SELECTION ──────────────────────────────────────────────
+function selectStatus(s) {
+  state.pendingStatus = s;
+  document.querySelectorAll('.status-option').forEach(el => {
+    el.className = 'status-option';
+  });
+  const btn = document.querySelector(`[data-status="${s}"]`);
+  if (s === 'safe')      btn.classList.add('selected-safe');
+  if (s === 'uncertain') btn.classList.add('selected-uncertain');
+  if (s === 'help')      btn.classList.add('selected-help');
+}
+
+function sendUpdate() {
+  state.status = state.pendingStatus;
+  addTimelineEntry(state.status);
+  applyStatusColors(state.status);
+  renderSignalCard();
+
+  const newLink = generateShareLink();
+  window.history.replaceState(null, '', newLink);
+
+  showToast('✅ Status updated — link refreshed!');
+}
+
+function addTimelineEntry(status) {
+  state.timeline.push({ status, time: new Date() });
+}
+
+// ── FAMILY VIEW ───────────────────────────────────────────────────
+function renderFamilyView() {
+  const cfg = STATUS_CONFIG[state.status];
+  const now = formatTime(new Date());
+
+  document.getElementById('family-emoji').textContent       = cfg.emoji;
+  document.getElementById('family-name').textContent        = state.name.split(' ')[0];
+  document.getElementById('family-status-label').textContent = cfg.familyLabel;
+  document.getElementById('family-subline').textContent     = 'Last signal from ' + state.cityCurrentIn;
+  document.getElementById('family-sb-label').textContent    = cfg.bar;
+  document.getElementById('family-sb-time').textContent     = 'Updated ' + now;
+  document.getElementById('family-fullname').textContent    = state.name;
+  document.getElementById('family-location').textContent    = state.cityCurrentIn + ' → Family in ' + state.cityFamilyIn;
+
+  const fMsg = document.getElementById('family-personal-message');
+  if (state.message) {
+    fMsg.textContent = '"' + state.message + '"';
+    fMsg.classList.add('visible');
+  } else {
+    fMsg.classList.remove('visible');
+  }
+
+  // Timeline
+  const tl = document.getElementById('family-timeline');
+  tl.innerHTML = '';
+  [...state.timeline].reverse().forEach(entry => {
+    const ecfg = STATUS_CONFIG[entry.status];
+    const dotClass = entry.status === 'safe' ? 'safe' : entry.status === 'uncertain' ? 'uncertain' : 'help';
+    const li = document.createElement('li');
+    li.className = 'timeline-item';
+    li.innerHTML = `
+      <div class="timeline-dot ${dotClass}">${ecfg.emoji}</div>
+      <div class="timeline-body">
+        <div class="timeline-status">${ecfg.bar}</div>
+        <div class="timeline-time">${formatFullTime(entry.time)}</div>
+      </div>`;
+    tl.appendChild(li);
+  });
+}
+
+function showFamilyView() {
+  prevScreen = 'signal';
+  renderFamilyView();
+  showScreen('family');
+}
+
+function goBack() {
+  showScreen(prevScreen);
+}
+
+// ── SHARE: WHATSAPP ───────────────────────────────────────────────
+document.getElementById('btn-whatsapp').addEventListener('click', () => {
+  const cfg = STATUS_CONFIG[state.status];
+  const url = generateShareLink();
+  const text = `${cfg.emoji} *${state.name} is ${cfg.bar.toUpperCase()}* — Live Safety Signal\n📍 Currently in: ${state.cityCurrentIn}\n👨‍👩‍👧 Family in: ${state.cityFamilyIn}\n⏰ Last updated: ${formatTime(new Date())}\n\nTrack live safety status: 👉 ${url}\n\n_SafeSignal — Free crisis tool by Innowrap Technologies_`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+});
+
+// ── SHARE: COPY LINK ──────────────────────────────────────────────
+document.getElementById('btn-copy').addEventListener('click', () => {
+  navigator.clipboard.writeText(generateShareLink())
+    .then(() => showToast('🔗 Link copied to clipboard!'))
+    .catch(() => showToast('⚠️ Could not copy — please copy the URL manually.'));
+});
+
+// ── IMAGE CARD ────────────────────────────────────────────────────
+document.getElementById('btn-share-image').addEventListener('click', () => {
+  drawImageCard();
+  document.getElementById('modal-image').classList.add('open');
+});
+
+function closeModal() {
+  document.getElementById('modal-image').classList.remove('open');
+}
+
+document.getElementById('modal-image').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-image')) closeModal();
+});
+
+function drawImageCard() {
+  const canvas = document.getElementById('previewCanvas');
+  const ctx    = canvas.getContext('2d');
+  const W = 1080, H = 1080;
+  canvas.width = W; canvas.height = H;
+
+  const cfg   = STATUS_CONFIG[state.status];
+  const color = cfg.color;
+
+  // Background gradient
+  const bgGrad = ctx.createRadialGradient(W/2, H*0.3, 0, W/2, H/2, W*0.9);
+  bgGrad.addColorStop(0, '#0F1A16');
+  bgGrad.addColorStop(1, '#080C0B');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Glow
+  const glow = ctx.createRadialGradient(W/2, 220, 0, W/2, 220, 500);
+  glow.addColorStop(0, color + '22');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.025)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 72) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 72) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  // Top accent line
+  const line = ctx.createLinearGradient(0, 0, W, 0);
+  line.addColorStop(0, 'transparent');
+  line.addColorStop(0.3, color);
+  line.addColorStop(0.7, color);
+  line.addColorStop(1, 'transparent');
+  ctx.fillStyle = line;
+  ctx.fillRect(0, 0, W, 5);
+
+  // Brand wordmark (top-left)
+  ctx.fillStyle = color;
+  ctx.font = 'bold 36px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('SafeSignal', 60, 70);
+
+  // Timestamp (top-right)
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '28px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(formatFullTime(new Date()), W - 60, 70);
+
+  // Big emoji
+  ctx.font = '180px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(cfg.emoji, W/2, 330);
+
+  // Status label
+  ctx.fillStyle = color;
+  ctx.font = 'bold 80px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(cfg.label, W/2, 450);
+
+  // Multilingual
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = '300 32px sans-serif';
+  const multiLines = cfg.multi.split('\n');
+  multiLines.forEach((l, i) => ctx.fillText(l, W/2, 510 + i * 44));
+
+  // Divider
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(60, 620); ctx.lineTo(W - 60, 620);
+  ctx.stroke();
+
+  // Name
+  ctx.fillStyle = '#F0F4F2';
+  ctx.font = 'bold 88px Georgia, serif';
+  ctx.textAlign = 'center';
+  // Truncate long names
+  let nameText = state.name;
+  while (ctx.measureText(nameText).width > W - 120 && nameText.length > 4) {
+    nameText = nameText.slice(0, -1);
+  }
+  if (nameText !== state.name) nameText += '…';
+  ctx.fillText(nameText, W/2, 720);
+
+  // Location
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '34px sans-serif';
+  const locText = `📍 ${state.cityCurrentIn}  ›  Family in ${state.cityFamilyIn}`;
+  ctx.fillText(locText, W/2, 778);
+
+  // Message box
+  if (state.message) {
+    const msgY = 810;
+    const msgH = 100;
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    roundRect(ctx, 60, msgY, W - 120, msgH, 16);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = 'italic 28px Georgia, serif';
+    ctx.fillText('"' + truncate(state.message, 55) + '"', W/2, msgY + 56);
+  }
+
+  // Bottom strip
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(0, H - 90, W, 90);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '26px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('safesignal.innowrap.com', 60, H - 46);
+
+  ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillText('Free · No app needed · Works worldwide', W - 60, H - 46);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function downloadImage() {
+  const canvas = document.getElementById('previewCanvas');
+  const link = document.createElement('a');
+  link.download = `safesignal-${state.name.replace(/\s+/g,'-').toLowerCase()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('📥 Image saved!');
+}
+
+function shareWhatsAppImage() {
+  downloadImage();
+  const cfg = STATUS_CONFIG[state.status];
+  const url = generateShareLink();
+  const text = `${cfg.emoji} *${state.name} is ${cfg.bar.toUpperCase()}* — See image for my safety signal. Track live safety status here: 👉 ${url}\n\n_SafeSignal — Free crisis tool by Innowrap Technologies_`;
+  setTimeout(() => window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'), 500);
+}
+
+// ── TOAST ────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── UTILS ────────────────────────────────────────────────────────
+function formatTime(d) {
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+function formatFullTime(d) {
+  return d.toLocaleString([], { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+function truncate(str, n) {
+  return str.length > n ? str.slice(0, n) + '…' : str;
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+
+function initPlacesFallback() {
+  try {
+    if (typeof google === 'object' && typeof google.maps === 'object') {
+      const opts = { types: ['(cities)'] };
+      const cw = new google.maps.places.Autocomplete(document.getElementById('input-city-current'), opts);
+      const fw = new google.maps.places.Autocomplete(document.getElementById('input-city-family'), opts);
+
+      cw.addListener('place_changed', () => {
+        const place = cw.getPlace();
+        if (place.name) document.getElementById('input-city-current').value = place.name;
+      });
+
+      fw.addListener('place_changed', () => {
+        const place = fw.getPlace();
+        if (place.name) document.getElementById('input-city-family').value = place.name;
+      });
+    }
+  } catch (e) {
+    console.warn("Places initialization failed", e);
+  }
+}
+
+window.initPlacesFallback = initPlacesFallback;
+
+function startNewSignal() {
+  if (confirm("Are you sure? This will reset your current signal.")) {
+    state.name = '';
+    state.cityCurrentIn = '';
+    state.cityFamilyIn = '';
+    state.message = '';
+    state.status = 'safe';
+    state.pendingStatus = 'safe';
+    state.timeline = [];
+    
+    document.getElementById('input-name').value = '';
+    document.getElementById('input-city-current').value = '';
+    document.getElementById('input-city-family').value = '';
+    document.getElementById('input-message').value = '';
+    document.getElementById('char-count').textContent = '0';
+    
+    window.history.replaceState(null, '', window.location.pathname);
+    showScreen('setup');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const data = params.get('data');
+  if (data) {
+    try {
+      const decodedStr = decodeURIComponent(atob(data));
+      const payload = JSON.parse(decodedStr);
+      state.name = payload.n;
+      state.cityCurrentIn = payload.c;
+      state.cityFamilyIn = payload.f;
+      state.message = payload.m;
+      state.status = payload.s;
+      state.pendingStatus = payload.s;
+      if (payload.t) {
+        state.timeline = payload.t.map(x => ({ status: x.s, time: new Date(x.t) }));
+      }
+      applyStatusColors(state.status);
+      showFamilyView();
+    } catch (e) {
+      console.error("Failed to parse signal data", e);
+      showScreen('setup');
+    }
+  } else {
+    showScreen('setup');
+  }
+});
+
+</script>
 </body>
-
 </html>
