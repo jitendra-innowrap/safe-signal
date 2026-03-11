@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeSignal — I'm Safe | By Innowrap Technologies</title>
+<meta name="description" content="Free crisis safety tool. Send a real-time safety signal to loved ones worldwide. Built by Innowrap Technologies.">
+<meta property="og:title" content="SafeSignal — Live Safety Signal">
+<meta property="og:description" content="A loved one has shared their safety status with you. Open to see their live signal.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0B0F0E;
+  --surface:  #141A18;
+  --surface2: #1C2420;
+  --border:   rgba(255,255,255,0.08);
+  --green:    #22C55E;
+  --green-dim:#16A34A;
+  --amber:    #F59E0B;
+  --amber-dim:#D97706;
+  --red:      #EF4444;
+  --red-dim:  #DC2626;
+  --text:     #F0F4F2;
+  --muted:    #6B7C75;
+  --innowrap: #00B4D8;
+  --status:   var(--green);
+  --status-dim: var(--green-dim);
+  --radius:   16px;
+  --max-w:    520px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ───────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── TOP BAR ─────────────────────────────────────────────────── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(11,15,14,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-brand {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.brand-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--status);
+  animation: breathe 2s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.4); opacity: 0.7; }
+}
+.topbar-right {
+  font-size: 12px; color: var(--muted); font-weight: 400;
+}
+.topbar-right a { color: var(--innowrap); text-decoration: none; }
+.topbar-right a:hover { text-decoration: underline; }
+
+/* ── MAIN LAYOUT ─────────────────────────────────────────────── */
+main {
+  position: relative; z-index: 1;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 80px 20px 60px;
+}
+
+/* ── FADE IN ─────────────────────────────────────────────────── */
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+  opacity: 0;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SCREEN MANAGEMENT ───────────────────────────────────────── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── MULTILINGUAL STRIP ──────────────────────────────────────── */
+.lang-strip {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 32px;
+}
+.lang-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* ── SETUP SCREEN ────────────────────────────────────────────── */
+.setup-hero {
+  margin-bottom: 36px;
+}
+.setup-hero .eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--status);
+  margin-bottom: 12px;
+}
+.setup-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 8vw, 44px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.setup-hero h1 em {
+  font-style: italic;
+  color: var(--status);
+}
+.setup-hero p {
+  font-size: 15px; color: var(--muted); line-height: 1.6;
+}
+
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.form-group { margin-bottom: 20px; }
+.form-group:last-child { margin-bottom: 0; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 400px) { .form-row { grid-template-columns: 1fr; } }
+
+label {
+  display: block;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+input[type="text"], textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 16px;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+input[type="text"]:focus, textarea:focus {
+  border-color: var(--status);
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+}
+input[type="text"]::placeholder, textarea::placeholder {
+  color: var(--muted);
+  font-weight: 300;
+}
+textarea {
+  resize: none; height: 90px; line-height: 1.5;
+}
+
+.char-count {
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--status);
+  color: #000;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 8px;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(34,197,94,0.3);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.disclaimer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 16px;
+}
+
+/* ── STATUS BAR ──────────────────────────────────────────────── */
+.status-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--status);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.status-bar-left {
+  display: flex; align-items: center; gap: 10px;
+}
+.status-bar-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--status);
+  animation: breathe 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.status-bar-label {
+  font-weight: 600; font-size: 14px;
+  color: var(--status);
+  transition: color 0.2s;
+}
+.status-bar-time {
+  font-size: 11px; color: var(--muted);
+}
+
+/* ── SIGNAL CARD ─────────────────────────────────────────────── */
+.signal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+/* glow behind card */
+.signal-card::before {
+  content: '';
+  position: absolute;
+  top: -60px; left: 50%; transform: translateX(-50%);
+  width: 300px; height: 200px;
+  background: radial-gradient(circle, var(--status) 0%, transparent 70%);
+  opacity: 0.06;
+  pointer-events: none;
+  transition: background 0.2s;
+}
+
+.card-inner { padding: 28px; }
+
+.card-name {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(26px, 7vw, 36px);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.card-location {
+  font-size: 14px; color: var(--muted);
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.big-status {
+  background: var(--surface2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.big-status-emoji { font-size: 48px; display: block; margin-bottom: 8px; }
+.big-status-label {
+  font-size: 22px; font-weight: 700;
+  color: var(--status);
+  transition: color 0.2s;
+  margin-bottom: 6px;
+}
+.big-status-multi {
+  font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.8;
+}
+
+.meta-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 20px;
+}
+.meta-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.meta-chip-label {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 4px;
+}
+.meta-chip-value {
+  font-size: 13px; font-weight: 500; color: var(--text);
+}
+
+.personal-message {
+  background: var(--surface2);
+  border-left: 3px solid var(--status);
+  border-radius: 0 10px 10px 0;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--muted);
+  transition: border-color 0.2s;
+  display: none;
+}
+.personal-message.visible { display: block; }
+
+.timestamp {
+  font-size: 11px; color: var(--muted);
+  text-align: center; margin-bottom: 4px;
+}
+
+/* ── SHARE BUTTONS ───────────────────────────────────────────── */
+.share-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.btn-share {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, background 0.2s;
+  text-decoration: none;
+}
+.btn-share:hover {
+  transform: translateY(-1px);
+  border-color: var(--status);
+  background: rgba(34,197,94,0.08);
+}
+.btn-share.whatsapp:hover { border-color: #25D366; background: rgba(37,211,102,0.08); }
+.btn-share.image-btn:hover { border-color: var(--innowrap); background: rgba(0,180,216,0.08); }
+.btn-share.full-width { grid-column: 1/-1; }
+
+/* ── STATUS UPDATER ──────────────────────────────────────────── */
+.status-updater {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.updater-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 14px;
+}
+.status-options {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 16px;
+}
+.status-option {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 8px;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Outfit', sans-serif;
+  color: var(--muted);
+}
+.status-option .opt-emoji { font-size: 24px; }
+.status-option .opt-label { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+.status-option.selected-safe   { border-color: var(--green); background: rgba(34,197,94,0.1); color: var(--green); }
+.status-option.selected-uncertain { border-color: var(--amber); background: rgba(245,158,11,0.1); color: var(--amber); }
+.status-option.selected-help   { border-color: var(--red); background: rgba(239,68,68,0.1); color: var(--red); }
+.status-option:hover { border-color: var(--text); }
+
+.btn-update {
+  width: 100%;
+  padding: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-update:hover {
+  background: var(--status);
+  color: #000;
+  border-color: var(--status);
+}
+
+/* ── FAMILY VIEW ─────────────────────────────────────────────── */
+.family-view-btn {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+.family-view-btn:hover { border-color: var(--text); color: var(--text); }
+
+/* ── FAMILY SCREEN ───────────────────────────────────────────── */
+.family-header {
+  text-align: center;
+  padding: 32px 20px 20px;
+}
+.pulse-ring-wrap {
+  width: 140px; height: 140px;
+  position: relative; margin: 0 auto 24px;
+  display: flex; align-items: center; justify-content: center;
+}
+.pulse-ring {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--status);
+  animation: pulseRing 2s ease-in-out infinite;
+  transition: border-color 0.2s;
+}
+.pulse-ring-2 {
+  animation-delay: 0.5s;
+  opacity: 0.5;
+}
+@keyframes pulseRing {
+  0%   { transform: scale(0.9); box-shadow: 0 0 0 0 var(--status); opacity: 1; }
+  70%  { transform: scale(1.1); box-shadow: 0 0 0 20px transparent; opacity: 0.4; }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 transparent; opacity: 1; }
+}
+.pulse-emoji {
+  font-size: 64px;
+  position: relative; z-index: 1;
+}
+.family-name {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 8vw, 40px);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.family-status-label {
+  font-size: 20px; font-weight: 600;
+  color: var(--status); margin-bottom: 8px;
+}
+.family-subline {
+  font-size: 14px; color: var(--muted);
+}
+
+.family-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+/* ── TIMELINE ────────────────────────────────────────────────── */
+.timeline { list-style: none; }
+.timeline-item {
+  display: flex; gap: 14px;
+  padding-bottom: 20px;
+  position: relative;
+}
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 11px; top: 24px; bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.timeline-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  position: relative; z-index: 1;
+}
+.timeline-dot.safe { border-color: var(--green); background: rgba(34,197,94,0.1); }
+.timeline-dot.uncertain { border-color: var(--amber); background: rgba(245,158,11,0.1); }
+.timeline-dot.help { border-color: var(--red); background: rgba(239,68,68,0.1); }
+.timeline-body { flex: 1; }
+.timeline-status {
+  font-size: 13px; font-weight: 600; color: var(--text);
+}
+.timeline-time { font-size: 11px; color: var(--muted); }
+
+.reassurance {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+/* ── BACK BUTTON ─────────────────────────────────────────────── */
+.btn-back {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none;
+  color: var(--muted); font-family: 'Outfit', sans-serif;
+  font-size: 13px; cursor: pointer;
+  margin-bottom: 20px;
+  padding: 0;
+  transition: color 0.2s;
+}
+.btn-back:hover { color: var(--text); }
+
+/* ── IMAGE MODAL ─────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 480px;
+  width: 100%;
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-overlay.open .modal-box { transform: translateY(0); }
+.modal-title {
+  font-size: 14px; font-weight: 600; margin-bottom: 16px;
+  color: var(--muted);
+}
+#previewCanvas {
+  width: 100%; aspect-ratio: 1;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  display: block;
+}
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-modal-close {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 50%; width: 32px; height: 32px;
+  color: var(--muted); font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.2s;
+}
+.modal-box { position: relative; }
+.btn-modal-close:hover { color: var(--text); }
+
+/* ── TOAST ───────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 12px 24px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text);
+  z-index: 300;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── FOOTER ──────────────────────────────────────────────────── */
+footer {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 24px 20px 40px;
+  font-size: 12px; color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+  max-width: var(--max-w);
+  margin-left: auto; margin-right: auto;
+}
+footer a { color: var(--innowrap); text-decoration: none; }
+footer .cta-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--innowrap);
+  font-weight: 500;
+}
+
+/* ── STATUS COLOUR TRANSITIONS ───────────────────────────────── */
+.status-transition * { transition: color 0.2s, border-color 0.2s, background 0.2s; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-dot"></div>
+    SafeSignal
+  </div>
+  <div class="topbar-right">
+    Free tool by <a href="https://innowrap.com" target="_blank">Innowrap Technologies</a>
+  </div>
+</div>
+
+<main>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SCREEN 1: SETUP                                 -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div id="screen-setup" class="screen active fade-in">
+    <div class="setup-hero">
+      <div class="eyebrow">🛡️ Crisis Safety Signal</div>
+      <h1>Let your loved ones<br>know you're <em>safe.</em></h1>
+      <p>One tap. A shareable link. Instant peace of mind — wherever in the world your family is.</p>
+    </div>
+
+    <div class="lang-strip">
+      <span class="lang-chip">I'm Safe</span>
+      <span class="lang-chip">أنا بخير</span>
+      <span class="lang-chip">मैं सुरक्षित हूँ</span>
+      <span class="lang-chip">Я в безопасности</span>
+      <span class="lang-chip">Je suis en sécurité</span>
+      <span class="lang-chip">Estoy bien</span>
+      <span class="lang-chip">我很安全</span>
+    </div>
+
+    <div class="form-card">
+      <div class="form-group">
+        <label for="input-name">Your Full Name</label>
+        <input type="text" id="input-name" placeholder="e.g. Maria Santos" autocomplete="name">
+      </div>
+
+      <div class="form-group form-row">
+        <div>
+          <label for="input-city-current">You Are Currently In</label>
+          <input type="text" id="input-city-current" placeholder="Your city">
+        </div>
+        <div>
+          <label for="input-city-family">Your Family Is In</label>
+          <input type="text" id="input-city-family" placeholder="Family's city">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="input-message">Personal Message <span style="font-weight:300;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea id="input-message" placeholder="Optional message to your family — they will see this on your safety card." maxlength="200"></textarea>
+        <div class="char-count"><span id="char-count">0</span> / 200</div>
+      </div>
+
+      <button class="btn-primary" id="btn-generate">Generate My Safety Signal →</button>
+    </div>
+
+    <p class="disclaimer">No account. No app. No data stored on servers.<br>Works in any country — any language.</p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SCREEN 2: SIGNAL CARD (SENDER VIEW)             -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div id="screen-signal" class="screen">
+    <div class="status-bar status-transition">
+      <div class="status-bar-left">
+        <div class="status-bar-dot"></div>
+        <div class="status-bar-label" id="sb-label">Safe</div>
+      </div>
+      <div class="status-bar-time" id="sb-time">—</div>
+    </div>
+
+    <div class="signal-card status-transition">
+      <div class="card-inner">
+        <div class="card-name" id="card-name">—</div>
+        <div class="card-location">
+          <span>📍</span>
+          <span id="card-location-text">—</span>
+        </div>
+
+        <div class="big-status">
+          <span class="big-status-emoji" id="card-emoji">🟢</span>
+          <div class="big-status-label" id="card-status-label">I AM SAFE</div>
+          <div class="big-status-multi" id="card-status-multi">
+            أنا بخير &nbsp;·&nbsp; मैं सुरक्षित हूँ<br>
+            Я в безопасности &nbsp;·&nbsp; Je suis en sécurité
+          </div>
+        </div>
+
+        <div class="meta-grid">
+          <div class="meta-chip">
+            <div class="meta-chip-label">Last Updated</div>
+            <div class="meta-chip-value" id="meta-updated">—</div>
+          </div>
+          <div class="meta-chip">
+            <div class="meta-chip-label">Status</div>
+            <div class="meta-chip-value" id="meta-status">Safe 🟢</div>
+          </div>
+          <div class="meta-chip">
+            <div class="meta-chip-label">From</div>
+            <div class="meta-chip-value" id="meta-city">—</div>
+          </div>
+          <div class="meta-chip">
+            <div class="meta-chip-label">Signal Views</div>
+            <div class="meta-chip-value" id="meta-views">—</div>
+          </div>
+        </div>
+
+        <div class="personal-message" id="card-personal-message"></div>
+        <div class="timestamp" id="card-timestamp"></div>
+      </div>
+    </div>
+
+    <!-- Share buttons -->
+    <div class="share-row">
+      <button class="btn-share whatsapp" id="btn-whatsapp">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </button>
+      <button class="btn-share" id="btn-copy">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy Link
+      </button>
+    </div>
+    <div class="share-row">
+      <button class="btn-share image-btn full-width" id="btn-share-image">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Share as Image Card
+      </button>
+    </div>
+
+    <!-- Status updater -->
+    <div class="status-updater">
+      <div class="updater-label">Update Your Status</div>
+      <div class="status-options">
+        <button class="status-option selected-safe" data-status="safe" onclick="selectStatus('safe')">
+          <span class="opt-emoji">🟢</span>
+          <span class="opt-label">Safe</span>
+        </button>
+        <button class="status-option" data-status="uncertain" onclick="selectStatus('uncertain')">
+          <span class="opt-emoji">🟡</span>
+          <span class="opt-label">Uncertain</span>
+        </button>
+        <button class="status-option" data-status="help" onclick="selectStatus('help')">
+          <span class="opt-emoji">🔴</span>
+          <span class="opt-label">Need Help</span>
+        </button>
+      </div>
+      <button class="btn-update" onclick="sendUpdate()">Send Updated Signal</button>
+    </div>
+
+    <button class="family-view-btn" onclick="showFamilyView()">👁️ Preview Family View</button>
+
+    <footer>
+      Built by <a href="https://innowrap.com" target="_blank">Innowrap Technologies</a><br>
+      <a class="cta-link" href="https://innowrap.com" target="_blank">Need a crisis tool for your org? Talk to us →</a>
+    </footer>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SCREEN 3: FAMILY VIEW                           -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div id="screen-family" class="screen">
+    <button class="btn-back" onclick="goBack()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Signal
+    </button>
+
+    <div class="family-header">
+      <div class="pulse-ring-wrap">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring pulse-ring-2"></div>
+        <div class="pulse-emoji" id="family-emoji">🟢</div>
+      </div>
+      <div class="family-name" id="family-name">—</div>
+      <div class="family-status-label" id="family-status-label">is safe ✅</div>
+      <div class="family-subline" id="family-subline">Last signal from —</div>
+    </div>
+
+    <div class="family-card status-transition">
+      <div class="status-bar" style="margin-bottom:16px">
+        <div class="status-bar-left">
+          <div class="status-bar-dot"></div>
+          <div class="status-bar-label" id="family-sb-label">Safe</div>
+        </div>
+        <div class="status-bar-time" id="family-sb-time">—</div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div class="meta-chip-label" style="margin-bottom:4px">Name</div>
+        <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700" id="family-fullname">—</div>
+      </div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:16px">
+        📍 <span id="family-location">—</span>
+      </div>
+
+      <div class="personal-message" id="family-personal-message" style="margin-bottom:16px"></div>
+
+      <div class="meta-chip-label" style="margin-bottom:12px">Update Timeline</div>
+      <ul class="timeline" id="family-timeline"></ul>
+    </div>
+
+    <div class="reassurance">
+      Bookmark this page for live updates.<br>
+      No app needed. Works on any phone, anywhere.
+    </div>
+
+    <footer>
+      Built by <a href="https://innowrap.com" target="_blank">Innowrap Technologies</a><br>
+      <a class="cta-link" href="https://innowrap.com" target="_blank">Need a crisis tool for your org? Talk to us →</a>
+    </footer>
+  </div>
+
+</main>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- IMAGE CARD MODAL                                     -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-image">
+  <div class="modal-box">
+    <button class="btn-modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">📤 Share as Image Card</div>
+    <canvas id="previewCanvas" width="1080" height="1080"></canvas>
+    <div class="modal-actions">
+      <button class="btn-share" onclick="downloadImage()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save Image
+      </button>
+      <button class="btn-share whatsapp" onclick="shareWhatsAppImage()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────
+const state = {
+  name: '',
+  cityCurrentIn: '',
+  cityFamilyIn: '',
+  message: '',
+  status: 'safe',   // safe | uncertain | help
+  timeline: [],
+  pendingStatus: 'safe',
+  views: Math.floor(Math.random() * 90) + 10,
+};
+
+const STATUS_CONFIG = {
+  safe:      { color: '#22C55E', dimColor: '#16A34A', emoji: '🟢', label: 'I AM SAFE',             multi: 'أنا بخير · मैं सुरक्षित हूँ\nЯ в безопасности · Je suis en sécurité', familyLabel: 'is safe ✅',             bar: 'Safe',       meta: 'Safe 🟢' },
+  uncertain: { color: '#F59E0B', dimColor: '#D97706', emoji: '🟡', label: 'MONITORING SITUATION',  multi: 'أراقب الوضع · स्थिति पर नज़र रख रहा/रही हूँ\nСлежу за обстановкой · Je surveille la situation', familyLabel: 'status: Uncertain ⚠️', bar: 'Uncertain', meta: 'Uncertain 🟡' },
+  help:      { color: '#EF4444', dimColor: '#DC2626', emoji: '🔴', label: 'I NEED HELP',            multi: 'أحتاج مساعدة · मुझे मदद चाहिए\nМне нужна помощь · J\'ai besoin d\'aide',      familyLabel: 'needs help 🆘',          bar: 'Need Help', meta: 'Need Help 🔴' },
+};
+
+// ── SCREEN MANAGEMENT ────────────────────────────────────────────
+let currentScreen = 'setup';
+let prevScreen = 'signal';
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  el.classList.add('active', 'fade-in');
+  setTimeout(() => el.classList.remove('fade-in'), 500);
+  currentScreen = id;
+}
+
+// ── CSS VAR HELPER ────────────────────────────────────────────────
+function applyStatusColors(status) {
+  const cfg = STATUS_CONFIG[status];
+  document.documentElement.style.setProperty('--status', cfg.color);
+  document.documentElement.style.setProperty('--status-dim', cfg.dimColor);
+}
+
+// ── SETUP ────────────────────────────────────────────────────────
+const msgInput = document.getElementById('input-message');
+msgInput.addEventListener('input', () => {
+  document.getElementById('char-count').textContent = msgInput.value.length;
+});
+
+function generateShareLink() {
+  const payload = {
+    n: state.name,
+    c: state.cityCurrentIn,
+    f: state.cityFamilyIn,
+    m: state.message,
+    s: state.status,
+    t: state.timeline.map(x => ({s: x.status, t: new Date(x.time).getTime()}))
+  };
+  const b64 = btoa(encodeURIComponent(JSON.stringify(payload)));
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.searchParams.set('data', b64);
+  return url.toString();
+}
+
+document.getElementById('btn-generate').addEventListener('click', () => {
+  const name  = document.getElementById('input-name').value.trim();
+  const curr  = document.getElementById('input-city-current').value.trim();
+  const fam   = document.getElementById('input-city-family').value.trim();
+  const msg   = document.getElementById('input-message').value.trim();
+
+  if (!name || !curr || !fam) {
+    showToast('⚠️ Please fill in your name and both cities.');
+    return;
+  }
+
+  state.name         = name;
+  state.cityCurrentIn = curr;
+  state.cityFamilyIn  = fam;
+  state.message       = msg;
+  state.status        = 'safe';
+  state.pendingStatus = 'safe';
+  state.timeline      = [];
+  state.views         = Math.floor(Math.random() * 90) + 10;
+
+  addTimelineEntry('safe');
+  applyStatusColors('safe');
+  renderSignalCard();
+
+  const newLink = generateShareLink();
+  window.history.replaceState(null, '', newLink);
+
+  showScreen('signal');
+});
+
+// ── RENDER SIGNAL CARD ────────────────────────────────────────────
+function renderSignalCard() {
+  const cfg = STATUS_CONFIG[state.status];
+  const now = formatTime(new Date());
+
+  document.getElementById('card-name').textContent = state.name;
+  document.getElementById('card-location-text').textContent =
+    `${state.cityCurrentIn} → Family in ${state.cityFamilyIn}`;
+
+  document.getElementById('sb-label').textContent = cfg.bar;
+  document.getElementById('sb-time').textContent  = 'Updated ' + now;
+
+  document.getElementById('card-emoji').textContent        = cfg.emoji;
+  document.getElementById('card-status-label').textContent = cfg.label;
+  document.getElementById('card-status-multi').innerHTML   = cfg.multi.replace('\n', '<br>');
+
+  document.getElementById('meta-updated').textContent = now;
+  document.getElementById('meta-status').textContent  = cfg.meta;
+  document.getElementById('meta-city').textContent    = state.cityCurrentIn;
+  document.getElementById('meta-views').textContent   = state.views + ' views';
+
+  const msgEl = document.getElementById('card-personal-message');
+  if (state.message) {
+    msgEl.textContent = '"' + state.message + '"';
+    msgEl.classList.add('visible');
+  } else {
+    msgEl.classList.remove('visible');
+  }
+
+  document.getElementById('card-timestamp').textContent =
+    'Signal generated: ' + formatFullTime(new Date());
+
+  renderFamilyView();
+}
+
+// ── STATUS SELECTION ──────────────────────────────────────────────
+function selectStatus(s) {
+  state.pendingStatus = s;
+  document.querySelectorAll('.status-option').forEach(el => {
+    el.className = 'status-option';
+  });
+  const btn = document.querySelector(`[data-status="${s}"]`);
+  if (s === 'safe')      btn.classList.add('selected-safe');
+  if (s === 'uncertain') btn.classList.add('selected-uncertain');
+  if (s === 'help')      btn.classList.add('selected-help');
+}
+
+function sendUpdate() {
+  state.status = state.pendingStatus;
+  addTimelineEntry(state.status);
+  applyStatusColors(state.status);
+  renderSignalCard();
+
+  const newLink = generateShareLink();
+  window.history.replaceState(null, '', newLink);
+
+  showToast('✅ Status updated — link refreshed!');
+}
+
+function addTimelineEntry(status) {
+  state.timeline.push({ status, time: new Date() });
+}
+
+// ── FAMILY VIEW ───────────────────────────────────────────────────
+function renderFamilyView() {
+  const cfg = STATUS_CONFIG[state.status];
+  const now = formatTime(new Date());
+
+  document.getElementById('family-emoji').textContent       = cfg.emoji;
+  document.getElementById('family-name').textContent        = state.name.split(' ')[0];
+  document.getElementById('family-status-label').textContent = cfg.familyLabel;
+  document.getElementById('family-subline').textContent     = 'Last signal from ' + state.cityCurrentIn;
+  document.getElementById('family-sb-label').textContent    = cfg.bar;
+  document.getElementById('family-sb-time').textContent     = 'Updated ' + now;
+  document.getElementById('family-fullname').textContent    = state.name;
+  document.getElementById('family-location').textContent    = state.cityCurrentIn + ' → Family in ' + state.cityFamilyIn;
+
+  const fMsg = document.getElementById('family-personal-message');
+  if (state.message) {
+    fMsg.textContent = '"' + state.message + '"';
+    fMsg.classList.add('visible');
+  } else {
+    fMsg.classList.remove('visible');
+  }
+
+  // Timeline
+  const tl = document.getElementById('family-timeline');
+  tl.innerHTML = '';
+  [...state.timeline].reverse().forEach(entry => {
+    const ecfg = STATUS_CONFIG[entry.status];
+    const dotClass = entry.status === 'safe' ? 'safe' : entry.status === 'uncertain' ? 'uncertain' : 'help';
+    const li = document.createElement('li');
+    li.className = 'timeline-item';
+    li.innerHTML = `
+      <div class="timeline-dot ${dotClass}">${ecfg.emoji}</div>
+      <div class="timeline-body">
+        <div class="timeline-status">${ecfg.bar}</div>
+        <div class="timeline-time">${formatFullTime(entry.time)}</div>
+      </div>`;
+    tl.appendChild(li);
+  });
+}
+
+function showFamilyView() {
+  prevScreen = 'signal';
+  renderFamilyView();
+  showScreen('family');
+}
+
+function goBack() {
+  showScreen(prevScreen);
+}
+
+// ── SHARE: WHATSAPP ───────────────────────────────────────────────
+document.getElementById('btn-whatsapp').addEventListener('click', () => {
+  const cfg = STATUS_CONFIG[state.status];
+  const url = generateShareLink();
+  const text = `${cfg.emoji} *${state.name} is ${cfg.bar.toUpperCase()}* — Live Safety Signal\n📍 Currently in: ${state.cityCurrentIn}\n👨‍👩‍👧 Family in: ${state.cityFamilyIn}\n⏰ Last updated: ${formatTime(new Date())}\n\nTrack live safety status: 👉 ${url}\n\n_SafeSignal — Free crisis tool by Innowrap Technologies_`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+});
+
+// ── SHARE: COPY LINK ──────────────────────────────────────────────
+document.getElementById('btn-copy').addEventListener('click', () => {
+  navigator.clipboard.writeText(generateShareLink())
+    .then(() => showToast('🔗 Link copied to clipboard!'))
+    .catch(() => showToast('⚠️ Could not copy — please copy the URL manually.'));
+});
+
+// ── IMAGE CARD ────────────────────────────────────────────────────
+document.getElementById('btn-share-image').addEventListener('click', () => {
+  drawImageCard();
+  document.getElementById('modal-image').classList.add('open');
+});
+
+function closeModal() {
+  document.getElementById('modal-image').classList.remove('open');
+}
+
+document.getElementById('modal-image').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-image')) closeModal();
+});
+
+function drawImageCard() {
+  const canvas = document.getElementById('previewCanvas');
+  const ctx    = canvas.getContext('2d');
+  const W = 1080, H = 1080;
+  canvas.width = W; canvas.height = H;
+
+  const cfg   = STATUS_CONFIG[state.status];
+  const color = cfg.color;
+
+  // Background gradient
+  const bgGrad = ctx.createRadialGradient(W/2, H*0.3, 0, W/2, H/2, W*0.9);
+  bgGrad.addColorStop(0, '#0F1A16');
+  bgGrad.addColorStop(1, '#080C0B');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Glow
+  const glow = ctx.createRadialGradient(W/2, 220, 0, W/2, 220, 500);
+  glow.addColorStop(0, color + '22');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.025)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 72) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 72) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  // Top accent line
+  const line = ctx.createLinearGradient(0, 0, W, 0);
+  line.addColorStop(0, 'transparent');
+  line.addColorStop(0.3, color);
+  line.addColorStop(0.7, color);
+  line.addColorStop(1, 'transparent');
+  ctx.fillStyle = line;
+  ctx.fillRect(0, 0, W, 5);
+
+  // Brand wordmark (top-left)
+  ctx.fillStyle = color;
+  ctx.font = 'bold 36px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('SafeSignal', 60, 70);
+
+  // Timestamp (top-right)
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '28px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(formatFullTime(new Date()), W - 60, 70);
+
+  // Big emoji
+  ctx.font = '180px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(cfg.emoji, W/2, 330);
+
+  // Status label
+  ctx.fillStyle = color;
+  ctx.font = 'bold 80px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(cfg.label, W/2, 450);
+
+  // Multilingual
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = '300 32px sans-serif';
+  const multiLines = cfg.multi.split('\n');
+  multiLines.forEach((l, i) => ctx.fillText(l, W/2, 510 + i * 44));
+
+  // Divider
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(60, 620); ctx.lineTo(W - 60, 620);
+  ctx.stroke();
+
+  // Name
+  ctx.fillStyle = '#F0F4F2';
+  ctx.font = 'bold 88px Georgia, serif';
+  ctx.textAlign = 'center';
+  // Truncate long names
+  let nameText = state.name;
+  while (ctx.measureText(nameText).width > W - 120 && nameText.length > 4) {
+    nameText = nameText.slice(0, -1);
+  }
+  if (nameText !== state.name) nameText += '…';
+  ctx.fillText(nameText, W/2, 720);
+
+  // Location
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '34px sans-serif';
+  const locText = `📍 ${state.cityCurrentIn}  ›  Family in ${state.cityFamilyIn}`;
+  ctx.fillText(locText, W/2, 778);
+
+  // Message box
+  if (state.message) {
+    const msgY = 810;
+    const msgH = 100;
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    roundRect(ctx, 60, msgY, W - 120, msgH, 16);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = 'italic 28px Georgia, serif';
+    ctx.fillText('"' + truncate(state.message, 55) + '"', W/2, msgY + 56);
+  }
+
+  // Bottom strip
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(0, H - 90, W, 90);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '26px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('safesignal.innowrap.com', 60, H - 46);
+
+  ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillText('Free · No app needed · Works worldwide', W - 60, H - 46);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function downloadImage() {
+  const canvas = document.getElementById('previewCanvas');
+  const link = document.createElement('a');
+  link.download = `safesignal-${state.name.replace(/\s+/g,'-').toLowerCase()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('📥 Image saved!');
+}
+
+function shareWhatsAppImage() {
+  downloadImage();
+  const cfg = STATUS_CONFIG[state.status];
+  const text = `${cfg.emoji} *${state.name} is ${cfg.bar.toUpperCase()}* — See image for my safety signal.\n\n_SafeSignal — Free crisis tool by Innowrap Technologies_\nsafesignal.innowrap.com`;
+  setTimeout(() => window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'), 500);
+}
+
+// ── TOAST ────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── UTILS ────────────────────────────────────────────────────────
+function formatTime(d) {
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+function formatFullTime(d) {
+  return d.toLocaleString([], { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+function truncate(str, n) {
+  return str.length > n ? str.slice(0, n) + '…' : str;
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const data = params.get('data');
+  if (data) {
+    try {
+      const decodedStr = decodeURIComponent(atob(data));
+      const payload = JSON.parse(decodedStr);
+      state.name = payload.n;
+      state.cityCurrentIn = payload.c;
+      state.cityFamilyIn = payload.f;
+      state.message = payload.m;
+      state.status = payload.s;
+      state.pendingStatus = payload.s;
+      if (payload.t) {
+        state.timeline = payload.t.map(x => ({ status: x.s, time: new Date(x.t) }));
+      }
+      applyStatusColors(state.status);
+      showFamilyView();
+    } catch (e) {
+      console.error("Failed to parse signal data", e);
+      showScreen('setup');
+    }
+  } else {
+    showScreen('setup');
+  }
+});
+
+</script>
+</body>
+</html>
